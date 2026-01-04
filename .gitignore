@@ -1,0 +1,80 @@
+############################
+# OS / Editor
+############################
+.DS_Store
+Thumbs.db
+*.swp
+*.log
+.history/
+.atom/
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+############################
+# Dart / Flutter
+############################
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+.flutter-plugins
+.flutter-plugins-dependencies
+coverage/
+build/
+**/doc/api/
+
+############################
+# Android
+############################
+android/.gradle/
+android/local.properties
+android/key.properties
+
+# Android build outputs
+android/app/build/
+android/app/debug/
+android/app/profile/
+android/app/release/
+
+# Keystores (VERY IMPORTANT)
+*.jks
+*.keystore
+
+############################
+# iOS
+############################
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/ephemeral/
+ios/Flutter/.last_build_id
+ios/Runner.xcworkspace
+ios/DerivedData/
+
+############################
+# Swift / Xcode
+############################
+*.xcuserstate
+*.xcuserdata
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+
+############################
+# Build / Logs
+############################
+.build/
+.buildlog/
+buildlog/
+app.*.symbols
+app.*.map.json
+
+############################
+# Versioning / Migration
+############################
+.swiftpm/
+.svn/
+migrate_working_dir/
