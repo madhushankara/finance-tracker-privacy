@@ -12,22 +12,17 @@ final class KeyboardBackDismissScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: FocusManager.instance,
-      builder: (context, _) {
-        final focused = FocusManager.instance.primaryFocus;
-        final keyboardOpen = focused != null && focused.hasFocus;
+    final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
 
-        return PopScope(
-          canPop: !keyboardOpen,
-          onPopInvokedWithResult: (didPop, result) {
-            if (didPop) return;
-            if (!keyboardOpen) return;
-            FocusManager.instance.primaryFocus?.unfocus();
-          },
-          child: child,
-        );
+    return PopScope(
+      // When the keyboard is visible, consume the first back press to dismiss it.
+      canPop: !keyboardOpen,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (!keyboardOpen) return;
+        FocusManager.instance.primaryFocus?.unfocus();
       },
+      child: child,
     );
   }
 }

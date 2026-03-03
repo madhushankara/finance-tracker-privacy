@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../animations/motion.dart';
@@ -584,10 +585,34 @@ final class _AppShell extends StatefulWidget {
 
 final class _AppShellState extends State<_AppShell> {
   DateTime? _lastBackPressedAt;
+  Timer? _exitArmResetTimer;
 
   void _onTapBranch(int index) {
     widget.shell.goBranch(index);
     setState(() {});
+  }
+
+  bool _isExitArmed() {
+    final last = _lastBackPressedAt;
+    if (last == null) return false;
+    return DateTime.now().difference(last) <= const Duration(seconds: 2);
+  }
+
+  void _armExit() {
+    _exitArmResetTimer?.cancel();
+    _lastBackPressedAt = DateTime.now();
+    _exitArmResetTimer = Timer(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      setState(() {
+        _lastBackPressedAt = null;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _exitArmResetTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -596,22 +621,24 @@ final class _AppShellState extends State<_AppShell> {
 
     final currentIndex = widget.shell.currentIndex;
 
+    final routerCanPop = GoRouter.of(context).canPop();
+    final exitArmed = _isExitArmed();
+
     return PopScope(
-      canPop: false,
+      // Layer 2 + 3:
+      // - If the router can pop (non-shell pages / branch stacks), allow it.
+      // - If we're at the shell root, require a second back press to exit.
+      canPop: routerCanPop || exitArmed,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
 
-        final now = DateTime.now();
-        final last = _lastBackPressedAt;
-        final withinWindow =
-            last != null && now.difference(last) <= const Duration(seconds: 2);
+        // If something can pop, don't interfere.
+        if (routerCanPop) return;
 
-        if (withinWindow) {
-          SystemNavigator.pop();
-          return;
-        }
+        // Shell root: first back arms exit, second back is allowed via canPop.
+        if (exitArmed) return;
 
-        _lastBackPressedAt = now;
+        setState(_armExit);
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Press again to exit app')),
