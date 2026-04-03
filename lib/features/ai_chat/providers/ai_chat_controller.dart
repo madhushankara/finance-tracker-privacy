@@ -80,7 +80,7 @@ final class AiChatController extends StateNotifier<AiChatState> {
   final Ref ref;
 
   final AiChatApi _api = AiChatApi(
-    baseUrl: "http://127.0.0.1:5000", // replace with your IP
+    baseUrl: "https://finance-tracker-backend-dgb3.onrender.com/", // replace with your IP
   );
 
   void setProcessingMode(AiChatProcessingMode mode) {
