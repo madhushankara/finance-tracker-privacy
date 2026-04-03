@@ -63,6 +63,7 @@ dependencies:
   # Data export
   share_plus: ^11.1.0
   archive: ^4.0.7
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:

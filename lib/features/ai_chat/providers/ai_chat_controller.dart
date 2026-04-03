@@ -6,6 +6,7 @@ import '../../../core/formatting/money_format.dart';
 import '../../../data/models/money.dart';
 import '../../settings/providers/settings_providers.dart';
 import '../models/ai_chat_message.dart';
+import '../services/ai_chat_api.dart';
 
 enum AiChatProcessingMode { onDevice, cloud }
 
@@ -77,6 +78,10 @@ final class AiChatController extends StateNotifier<AiChatState> {
   AiChatController(this.ref) : super(AiChatState.initial);
 
   final Ref ref;
+
+  final AiChatApi _api = AiChatApi(
+    baseUrl: "http://127.0.0.1:5000", // replace with your IP
+  );
 
   void setProcessingMode(AiChatProcessingMode mode) {
     state = state.copyWith(processingMode: mode);
@@ -212,9 +217,15 @@ final class AiChatController extends StateNotifier<AiChatState> {
     state = state.copyWith(nextId: typingId + 1);
 
     // Optional typing delay (1–2s).
-    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    // await Future<void>.delayed(const Duration(milliseconds: 1200));
 
-    final responseText = _mockResponse(text);
+    String responseText;
+
+      try {
+        responseText = await _api.sendMessage(text);
+      } catch (e) {
+        responseText = "⚠️Failed to connect to AI server.\nPlease try again.";
+      }
 
     final updated = state.messages
         .map(
